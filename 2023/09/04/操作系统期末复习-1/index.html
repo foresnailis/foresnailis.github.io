@@ -4,15 +4,27 @@
   <meta charset="utf-8">
   
   
-  <title>Hexo</title>
+  <title>操作系统期末复习 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
-<meta property="og:url" content="http://example.com/index.html">
+  <meta name="description" content="操作系统期末复习综述操作系统基本概念​	操作系统 ​	操作系统的特征：  并发 注意与并行的区别 通过分时实现     2. 共享 资源供多个并发执行进程使用  互斥共享方式&#x2F;同时访问方式  临界资源：一段时间只允许一个进程访问     3. 虚拟 把物理上的实体变为逻辑上对应物，例如：虚拟处理器（分时使用一个处理器，使之像是多个，时分复用）、虚拟存储器（逻辑上扩充存储器的容量，空分复用）">
+<meta property="og:type" content="article">
+<meta property="og:title" content="操作系统期末复习">
+<meta property="og:url" content="http://example.com/2023/09/04/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0-1/index.html">
 <meta property="og:site_name" content="Hexo">
+<meta property="og:description" content="操作系统期末复习综述操作系统基本概念​	操作系统 ​	操作系统的特征：  并发 注意与并行的区别 通过分时实现     2. 共享 资源供多个并发执行进程使用  互斥共享方式&#x2F;同时访问方式  临界资源：一段时间只允许一个进程访问     3. 虚拟 把物理上的实体变为逻辑上对应物，例如：虚拟处理器（分时使用一个处理器，使之像是多个，时分复用）、虚拟存储器（逻辑上扩充存储器的容量，空分复用）">
 <meta property="og:locale" content="en_US">
+<meta property="og:image" content="http://rxo7vw79y.hd-bkt.clouddn.com/img/image-20230625204815254.png">
+<meta property="og:image" content="http://rxo7vw79y.hd-bkt.clouddn.com/img/image-20230625213709339.png">
+<meta property="og:image" content="http://rxo7vw79y.hd-bkt.clouddn.com/img/image-20230625210314588.png">
+<meta property="og:image" content="http://rxo7vw79y.hd-bkt.clouddn.com/img/image-20230627152832550.png">
+<meta property="og:image" content="http://rxo7vw79y.hd-bkt.clouddn.com/img/image-20230627215513749.png">
+<meta property="og:image" content="http://rxo7vw79y.hd-bkt.clouddn.com/img/image-20230627222356843.png">
+<meta property="og:image" content="http://rxo7vw79y.hd-bkt.clouddn.com/img/image-20230627234101482.png">
+<meta property="article:published_time" content="2023-09-04T14:01:05.000Z">
+<meta property="article:modified_time" content="2023-09-04T14:01:17.439Z">
 <meta property="article:author" content="John Doe">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://rxo7vw79y.hd-bkt.clouddn.com/img/image-20230625204815254.png">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
   
@@ -71,94 +83,7 @@
 </header>
 
       <div class="outer">
-        <section id="main">
-  
-    <article id="post-强化学习笔记-贝尔曼公式" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/09/13/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F/" class="article-date">
-  <time class="dt-published" datetime="2023-09-13T14:34:32.000Z" itemprop="datePublished">2023-09-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/09/13/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F/">强化学习笔记--贝尔曼公式</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h4 id="贝尔曼公式学习"><a href="#贝尔曼公式学习" class="headerlink" title="贝尔曼公式学习"></a>贝尔曼公式学习</h4><p>​	trajectory（轨迹）的return（返回值），用于衡量某策略的优劣，即一个状态转移链条的最终reward值。</p>
-<p>​	计算过程中，对于长度较长的trajectory，一般有γ作为折扣因子。折扣因子较小，表示策略重视近期效果；折扣因子较大，表示策略重视远期效果。</p>
-<p>​	观察下面的例子：</p>
-<p><img src="https://zlisnail.cn/img/image-20230907161312156.png" alt="image-20230907161312156"></p>
-<p>这里，value<del>i</del>的定义是从s<del>i</del>出发的无限长度轨迹的return值。</p>
-<p>上述情况，表明一个状态的value，依赖于其他状态的value。</p>
-<p>于是，利用线性代数的知识，就可以解出该方程组，获得所有的value值：</p>
-<p><img src="https://zlisnail.cn/img/image-20230907164151117.png" alt="image-20230907164151117"></p>
-<p> 上面是对核心概念的理解，做了简化。下图则定义了强化学习最常用的几个变量。注意，大写的S&#x2F;A&#x2F;R，它们都是<strong>随机变量（random variables）</strong>。随机变量可以通过概率公式求出，可以对他们求期望等。</p>
-<p><img src="https://zlisnail.cn/img/image-20230907170454906.png" alt="image-20230907170454906"></p>
-<p>​	  由此，将多步连接起来，就得到了一个trajectory。在这个轨迹中，使用*G<del>t</del>*来表示discounted return。 于是，我们可以定义一个重要的变量：state-value function（简称state-value）。</p>
-<p><img src="https://zlisnail.cn/img/image-20230907171058820.png" alt="image-20230907171058820"></p>
-<p>由定义公式可见，该函数的自变量包括当前状态s和策略π。</p>
-<p>区别return与state value，return 是单个轨迹的总奖励值；而state value是从当前状态出发按照一定的策略，可能得到的所有轨迹的奖励值的<strong>期望</strong>。</p>
-<p>由上述定义公式，结合trajectory的概念，可以轻易地得出下式：</p>
-<p> <img src="https://zlisnail.cn/img/image-20230911212029725.png" alt="image-20230911212029725"></p>
-<p>其中，第一项的计算方法：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912145856573.png" alt="image-20230912145856573"></p>
-<p>第二项的计算方法：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912150431461.png" alt="image-20230912150431461"></p>
-<p>由此得到贝尔曼公式：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912150850381.png" alt="image-20230912150850381"></p>
-<p>所有s都有一个这样的式子，将所有式子联立，就可以得到一个方程组，解出所有的v。这个式子中，π就是策略；两个p就是环境模型。解出这个式子，得到v值，实际上也就是在<strong>评估一个策略</strong>（policy evaluation）。（从v的下标为π中，我们也可以看出，π是这个式子的关键）。</p>
-<p>分析这个式子，可以看到，state-value首先根据不同的动作去分类，然后分别考虑每个动作获得的即时奖励和长远奖励（用下一个状态的state-value来表示，state-value可以理解为一个状态的价值；价值越高，未来越有可能获得高奖励 ）。</p>
-<p>上述式子便于理解，但是是独立的。下面，我们来推导出贝尔曼公式的矩阵形式。</p>
-<p>首先，对上式进行简化，提炼出该式子的核心：即时奖励与长远奖励。</p>
-<p><img src="https://zlisnail.cn/img/image-20230912154047641.png" alt="image-20230912154047641"></p>
-<p>将上式中的v\r\P，替换成向量或矩阵，就可以得到：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912154850369.png" alt="image-20230912154850369"></p>
-<p>注意，上图里，大写字母P代表状态转移矩阵。矩阵有一种下标表示的写法，值得学习。另外，在定义向量的时候，规定向量每个元素的范围的写法，也非常有意思；R^n^既可以表示向量的长度，也可以表示向量元素的取值范围。别忘了将向量转置。</p>
-<p>例子：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912165518172.png" alt="image-20230912165518172"></p>
-<p>由上面的贝尔曼方程，我们可以轻易得到一种v的解法，那就是：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912175304959.png" alt="image-20230912175304959"></p>
-<p>但是该解法需要对矩阵求逆（该矩阵一定是有逆的，因为当γ小于1时，该矩阵为严格对角占优矩阵），当状态空间非常大时，求逆运算会非常复杂。于是，有以下迭代算法：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912175418012.png" alt="image-20230912175418012"></p>
-<p>其中，v<del>0</del>即为r<del>π</del>。当k趋于无穷时，v<del>k</del>无穷接近于v<del>π</del>，证明如下：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912175637624.png" alt="image-20230912175637624"></p>
-<h5 id="action-value"><a href="#action-value" class="headerlink" title="action value"></a>action value</h5><p>​	直译作动作价值，实际上当前状态也是因子：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912224228146.png" alt="image-20230912224228146"></p>
-<p>​	定义式子如下，用q<del>π</del>来表示：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912224645939.png" alt="image-20230912224645939"></p>
-<p>从这个图中就可以看到，实际上q<del>π</del>（s,a）就是将v<del>π</del>(s)中的因子替换掉（即时奖励+长久奖励）：</p>
-<p><img src="https://zlisnail.cn/img/image-20230912224916522.png" alt="image-20230912224916522"></p>
-<p>至此，本节结束。贝尔曼公式是整个强化学习的基础，后续会多次用到。若未来对贝尔曼公式有更深的理解，该笔记将继续更新。</p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/09/13/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F/" data-id="clmhuj26z0000bsw51aelg5vs" data-title="强化学习笔记--贝尔曼公式" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/" rel="tag">强化学习</a></li></ul>
-
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-操作系统期末复习-1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+        <section id="main"><article id="post-操作系统期末复习-1" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2023/09/04/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0-1/" class="article-date">
   <time class="dt-published" datetime="2023-09-04T14:01:05.000Z" itemprop="datePublished">2023-09-04</time>
@@ -171,8 +96,8 @@
       <header class="article-header">
         
   
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/09/04/%E6%93%8D%E4%BD%9C%E7%B3%BB%E7%BB%9F%E6%9C%9F%E6%9C%AB%E5%A4%8D%E4%B9%A0-1/">操作系统期末复习</a>
+    <h1 class="p-name article-title" itemprop="headline name">
+      操作系统期末复习
     </h1>
   
 
@@ -500,62 +425,28 @@
     </footer>
   </div>
   
-</article>
-
-
-
+    
+<nav id="article-nav">
   
-    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2023/09/04/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2023-09-04T11:05:24.631Z" itemprop="datePublished">2023-09-04</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
+    <a href="/2023/09/13/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F/" id="article-nav-newer" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Newer</strong>
+      <div class="article-nav-title">
         
+          强化学习笔记--贝尔曼公式
+        
+      </div>
+    </a>
   
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2023/09/04/hello-world/">Hello World</a>
-    </h1>
   
+    <a href="/2023/09/04/hello-world/" id="article-nav-older" class="article-nav-link-wrap">
+      <strong class="article-nav-caption">Older</strong>
+      <div class="article-nav-title">Hello World</div>
+    </a>
+  
+</nav>
 
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2023/09/04/hello-world/" data-id="clm4y9zb80000vcw55kjp87ex" data-title="Hello World" class="article-share-link"><span class="fa fa-share">Share</span></a>
-      
-      
-      
-    </footer>
-  </div>
   
 </article>
-
-
-
-  
 
 
 </section>
