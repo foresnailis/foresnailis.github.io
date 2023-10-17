@@ -1,0 +1,292 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>强化学习笔记（五）-随机近似与随机梯度下降 | 蜗牛小仓</title><meta name="author" content="lisnail"><meta name="copyright" content="lisnail"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="强化学习笔记（五）—随机近似与随机梯度下降为了能够更好地理解下一章要讲的时序差分方法(temporal-difference)，本章作为补充知识，弥补上一章与下一章之间的知识鸿沟。  mean estimation在强化学习方法中，有很多时候需要用到mean estimation，即用x的平均数估计x的期望。传统方法中，需要收集到所有采样后再求平均，造成计算效率不高。下面，我们研究一种增量迭代的方">
+<meta property="og:type" content="article">
+<meta property="og:title" content="强化学习笔记（五）-随机近似与随机梯度下降">
+<meta property="og:url" content="http://example.com/2023/10/17/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%94%EF%BC%89-%E9%9A%8F%E6%9C%BA%E8%BF%91%E4%BC%BC%E4%B8%8E%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/index.html">
+<meta property="og:site_name" content="蜗牛小仓">
+<meta property="og:description" content="强化学习笔记（五）—随机近似与随机梯度下降为了能够更好地理解下一章要讲的时序差分方法(temporal-difference)，本章作为补充知识，弥补上一章与下一章之间的知识鸿沟。  mean estimation在强化学习方法中，有很多时候需要用到mean estimation，即用x的平均数估计x的期望。传统方法中，需要收集到所有采样后再求平均，造成计算效率不高。下面，我们研究一种增量迭代的方">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://zlisnail.cn/img/image-20231010164027648.png">
+<meta property="article:published_time" content="2023-10-17T15:13:07.000Z">
+<meta property="article:modified_time" content="2023-10-17T15:13:56.664Z">
+<meta property="article:author" content="lisnail">
+<meta property="article:tag" content="强化学习">
+<meta property="article:tag" content="强化学习数学原理">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://zlisnail.cn/img/image-20231010164027648.png"><link rel="shortcut icon" href="/img/avatar.png"><link rel="canonical" href="http://example.com/2023/10/17/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%94%EF%BC%89-%E9%9A%8F%E6%9C%BA%E8%BF%91%E4%BC%BC%E4%B8%8E%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: {"path":"/search.xml","preload":false,"top_n_per_article":1,"unescape":false,"languages":{"hits_empty":"找不到您查询的内容：${query}","hits_stats":"共找到 ${hits} 篇文章"}},
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '强化学习笔记（五）-随机近似与随机梯度下降',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-10-17 23:13:56'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+    win.getCSS = (url,id = false) => new Promise((resolve, reject) => {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = url
+      if (id) link.id = id
+      link.onerror = reject
+      link.onload = link.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        link.onload = link.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(link)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/background.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="web_bg"></div><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="/img/avatar.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><hr class="custom-hr"/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg fixed" id="page-header" style="background-image: url('https://zlisnail.cn/img/image-20231010164027648.png')"><nav id="nav"><span id="blog-info"><a href="/" title="蜗牛小仓"><span class="site-name">蜗牛小仓</span></a></span><div id="menus"><div id="search-button"><a class="site-page social-icon search" href="javascript:void(0);"><i class="fas fa-search fa-fw"></i><span> 搜索</span></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fa fa-home"></i><span> 首页</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fa fa-archive"></i><span> 归档</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fa fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fa fa-folder-open"></i><span> 分类</span></a></div></div><div id="toggle-menu"><a class="site-page" href="javascript:void(0);"><i class="fas fa-bars fa-fw"></i></a></div></div></nav><div id="post-info"><h1 class="post-title">强化学习笔记（五）-随机近似与随机梯度下降</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-10-17T15:13:07.000Z" title="发表于 2023-10-17 23:13:07">2023-10-17</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-10-17T15:13:56.664Z" title="更新于 2023-10-17 23:13:56">2023-10-17</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/">强化学习</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-wordcount"><i class="far fa-file-word fa-fw post-meta-icon"></i><span class="post-meta-label">字数总计:</span><span class="word-count">2.2k</span><span class="post-meta-separator">|</span><i class="far fa-clock fa-fw post-meta-icon"></i><span class="post-meta-label">阅读时长:</span><span>6分钟</span></span><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title="强化学习笔记（五）-随机近似与随机梯度下降"><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">阅读量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="post-content" id="article-container"><h1 id="强化学习笔记（五）—随机近似与随机梯度下降"><a href="#强化学习笔记（五）—随机近似与随机梯度下降" class="headerlink" title="强化学习笔记（五）—随机近似与随机梯度下降"></a>强化学习笔记（五）—随机近似与随机梯度下降</h1><p>为了能够更好地理解下一章要讲的时序差分方法(temporal-difference)，本章作为补充知识，弥补上一章与下一章之间的知识鸿沟。</p>
+<hr>
+<h2 id="mean-estimation"><a href="#mean-estimation" class="headerlink" title="mean estimation"></a>mean estimation</h2><p>在强化学习方法中，有很多时候需要用到<strong>mean estimation</strong>，即用x的平均数估计x的期望。传统方法中，需要收集到所有采样后再求平均，造成计算效率不高。下面，我们研究一种增量迭代的方法，能够在采样的同时，更新x的平均数，从而能同步估计x的期望值。</p>
+<p>首先，传统方法如下：</p>
+<p><img src="https://zlisnail.cn/img/image-20231010163338611.png" alt="image-20231010163338611"></p>
+<p>新方法实际上就是研究了k次采样的平均数和k+1次采样平均数之间的关系：<br><img src="https://zlisnail.cn/img/image-20231010163551118.png" alt="image-20231010163551118"></p>
+<p>迭代过程如下：</p>
+<p><img src="https://zlisnail.cn/img/image-20231010163713358.png" alt="image-20231010163713358"></p>
+<p>要求得w~k+1~，需要两个量，w~k~和k。现在，我们对这个式子进行处理：</p>
+<p><img src="https://zlisnail.cn/img/image-20231010164027648.png" alt="image-20231010164027648"></p>
+<p>当α满足一定条件时，这个递推公式也可以估计x的期望。这就涉及到下面的Robbins-Monro algorithm。</p>
+<h2 id="Robbins-Monro-algorithm"><a href="#Robbins-Monro-algorithm" class="headerlink" title="Robbins-Monro algorithm"></a>Robbins-Monro algorithm</h2><p>随机采样（<strong>stochastic approximation</strong>，<strong>SA</strong>）方法，指代一类方法，它们会对随机变量进行采样，并通过迭代的方法进行方程的求解或者解决优化问题。相比于其它的求解方法，SA的优势在于不需要知道目标函数的表达式或是导数。Robbins-Monro算法就是一个SA方法，它是SA领域具有开创性质的成果；而随机梯度下降方法则是Robbins-Monro算法的一种特殊形式。下面，我们对Robbins-Monro算法进行进一步了解。</p>
+<p>Robbins-Monro算法解决的问题形式很简单：<br><img src="https://zlisnail.cn/img/image-20231010165601814.png" alt="image-20231010165601814"></p>
+<p>这之中，w可以是向量，也可以是标量。简单的形式往往蕴含巨大的能量，许多问题都可以化简为这样的形式；例如最优化问题，它需要求解极值点，而所谓的极值点实际上就是梯度为0的点，就可以化为这种形式。</p>
+<p>当函数g的表达式已知时，我们有很多种方法来求解这个方程；而当g的表达式未知时，比如一个复杂的神经网络，我们要求解一个输入w，使得神经网络的输出为0，那么我们就可以用Robbins-Monro算法来求解。</p>
+<h3 id="RM算法"><a href="#RM算法" class="headerlink" title="RM算法"></a>RM算法</h3><p>要求解$g(w^*)=0$，RM算法的求解方法如下：</p>
+<p><img src="https://zlisnail.cn/img/image-20231014204206261.png" alt="image-20231014204206261"></p>
+<p>其中，w~k~是第k次迭代得到的值，$\widetilde{g}$是对g的噪音观测值，a~k~是一个系数。记住，在RM算法中，函数g的表达式是不知道的。<strong>没有模型时，就需要数据。</strong></p>
+<p>RM算法需要一些约束条件：</p>
+<p><img src="https://zlisnail.cn/img/image-20231014205327290.png" alt="image-20231014205327290"></p>
+<blockquote>
+<p>术语with probability 1(w.p.1)的意思是，在概率意义上必定发生。在这里，w不是普通的数，它是带有概率的观测值；因此，用w.p.1表示一定会发生。这个术语在RL（reinforcement learning）中也会经常出现。</p>
+</blockquote>
+<p>仔细观察上面的约束条件。</p>
+<p>第一个条件，对函数g的梯度进行了要求。这个约束保证了函数单调递增、梯度有界、一定有零点。</p>
+<blockquote>
+<p>对于凸函数来说，我们要求它的最小值，也就是梯度为0的点。我们将它的梯度视作另一个新函数，这个函数的梯度（即hessian矩阵）一定是满足这个条件的，于是我们就可以用RM求解凸函数最优值。</p>
+<p>梯度有界是为了保证不会出现函数突然快速升高到无穷的情况，在这种情况下，在无穷附近取w值容易发散，收敛不到w^*^。</p>
+</blockquote>
+<p>第二个条件，对系数a~k~进行了要求。保证了a~k~收敛到0的同时，确保a~k~不会收敛地太快，防止它在有限步内就会收敛到0。</p>
+<blockquote>
+<p>保证a~k~能收敛到0，是为了让最后w~k+1~和w~k~能够相互靠近，越来越近，直到收敛到w~k~。而确保a~k~不会收敛地太快，有如下解释：</p>
+<p><img src="https://zlisnail.cn/img/image-20231014213245056.png" alt="image-20231014213245056"></p>
+<p>满足上述两个条件最常见的a~k~序列就是$a_k=\frac{1}{k}$ 。证明如下：</p>
+<p><img src="https://zlisnail.cn/img/image-20231014213729302.png" alt="image-20231014213729302"></p>
+</blockquote>
+<p>第三个条件，对测量误差η~k~进行了要求。常见的情况是η~k~满足独立同分布条件(iid)。</p>
+<p>回到上一节我们最后提出的问题，满足怎样条件的α~k~的mean estimation算法能够收敛？然后我们发现，α~k~就是RM算法中的系数a~k~。</p>
+<p><img src="https://zlisnail.cn/img/image-20231014214158939.png" alt="image-20231014214158939"></p>
+<p>这个算法转化为RM算法的形式，如下：</p>
+<p><img src="https://zlisnail.cn/img/image-20231014215021827.png" alt="image-20231014215021827"></p>
+<p>RM定理之外还有一个更广泛的定理，在此列出：</p>
+<p><img src="https://zlisnail.cn/img/image-20231014215236491.png" alt="image-20231014215236491"></p>
+<h3 id="Stochastic-gradient-descent-随机梯度下降"><a href="#Stochastic-gradient-descent-随机梯度下降" class="headerlink" title="Stochastic gradient descent 随机梯度下降"></a>Stochastic gradient descent 随机梯度下降</h3><p>SGD是RM算法的一个特殊情况。它也可以用来解释我们第一部分介绍的mean estimation算法。</p>
+<h4 id="SGD解决的问题与形式"><a href="#SGD解决的问题与形式" class="headerlink" title="SGD解决的问题与形式"></a>SGD解决的问题与形式</h4><p>SGD解决的问题描述如下：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017205538985.png" alt="image-20231017205538985"></p>
+<p>观察到上述问题描述中，一个重要的特征是有一个随机变量X，解决的问题是要针对X求使得f期望最小的w。针对这样的问题，可以有如下算法：</p>
+<p>gradient descent GD 梯度下降:<br><img src="https://zlisnail.cn/img/image-20231017210057215.png" alt="image-20231017210057215"></p>
+<p>梯度下降直接明了，但是由于X是随机变量，它的期望值得到；期望值直接由模型得到，即数学推导。</p>
+<p>batch gradient descent BGD 批量梯度下降：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017212621893.png" alt="image-20231017212621893"></p>
+<p>其实就是在GD的基础上做改进，通过大数定理来用数据取代模型。它会对X所有可能的取值采样，或者利用X的所有采样值，然后求平均，可能面临需要很多采样的问题。</p>
+<p>而SGD则直接用一次采样来估计期望值：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017212933807.png" alt="image-20231017212933807"></p>
+<h4 id="SGD收敛性原理"><a href="#SGD收敛性原理" class="headerlink" title="SGD收敛性原理"></a>SGD收敛性原理</h4><p>证明SGD收敛性，可以通过将SGD化为一个RM算法，然后利用RM算法收敛性来证明。</p>
+<p>因为SGD是对GD的改进，是利用一次采样估计总体期望的方法，因此我们可以将这次采样化为下式：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017220710545.png" alt="image-20231017220710545"></p>
+<p>这个形式就符合RM算法中的带有噪音的g函数的形式。受此启发，我们可以将求解$J(w)$最小值的SGD算法，看做是求解$\nabla{J(w)}=0$的RM算法（因为GD算法可以得到全局最优解，所以J是凸函数，所以可以这样转换）。如下图：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017221512368.png" alt="image-20231017221512368"></p>
+<p><img src="https://zlisnail.cn/img/image-20231017221532513.png" alt="image-20231017221532513"></p>
+<p>于是，我们可以直接套用RM的收敛条件，来说明SGD的收敛性：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017221700636.png" alt="image-20231017221700636"></p>
+<p> 这里边只有第一个条件有些特殊，它表示函数$f$必须是凸函数。</p>
+<h4 id="SGD实例"><a href="#SGD实例" class="headerlink" title="SGD实例"></a>SGD实例</h4><p>我们优化如下函数：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017215204127.png" alt="image-20231017215204127"></p>
+<p>易证，这是一个凸函数，所以可以用GD获得全局最优解；且最优解w^*^=E(X)。GD与SGD算法书写如下：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017215452801.png" alt="image-20231017215452801"></p>
+<p>可以观察到，这个问题的SGD算法与第一部分最后提出的mean estimation算法的形式一致。</p>
+<p>假设w/X均为二维向量，有以下实例：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017223952295.png" alt="image-20231017223952295"></p>
+<p>SGD收敛过程如下：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017224022509.png" alt="image-20231017224022509"></p>
+<h4 id="SGD的性质"><a href="#SGD的性质" class="headerlink" title="SGD的性质"></a>SGD的性质</h4><p>从上图可以看到，当w离最优值w^<em>^比较远时，SGD的行为接近于GD，向最优值快速收敛；当w离最优值w^</em>^比较近时，SGD就与GD的行为差距越来越大，体现出随机性。 证明如下，利用了中值定理和函数的凸性（证明中假设w为标量，没有给出向量的证法）：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017222600470.png" alt="image-20231017222600470"></p>
+<p><img src="https://zlisnail.cn/img/image-20231017222614931.png" alt="image-20231017222614931"></p>
+<p><img src="https://zlisnail.cn/img/image-20231017222632629.png" alt="image-20231017222632629"></p>
+<h4 id="无随机变量的SGD"><a href="#无随机变量的SGD" class="headerlink" title="无随机变量的SGD"></a>无随机变量的SGD</h4><p>考虑下面的优化问题：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017224603224.png" alt="image-20231017224603224"></p>
+<p>这个优化问题中没有随机变量，它的GD算法如下：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017224742091.png" alt="image-20231017224742091"></p>
+<p>然而依旧是老问题，如果x~i~太多，会导致GD算法太复杂。那么我们就可以用单个x~i~的函数梯度值来替代：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017224913354.png" alt="image-20231017224913354"></p>
+<p>这个思路很像SGD。而实际上，它就是SGD。这里，每次的x~k~是在所有的x~i~中等概率随机选取的。但是目标函数中没有随机变量，这个算法为什么是对的，又为什么是SGD呢？</p>
+<p>要解释这个问题，我们引入一个随机变量X：</p>
+<p><img src="https://zlisnail.cn/img/image-20231017225148267.png" alt="image-20231017225148267"></p>
+<p>于是，目标函数被转化为下面的形式：<br><img src="https://zlisnail.cn/img/image-20231017225217380.png" alt="image-20231017225217380"></p>
+<p>所以这个算法就是一个可以得到正确结果的SGD算法。注意，每次的x~k~是在所有的x~i~中等概率随机选取的，因此它可能被选取多次，也可能一次也没有被选中。 </p>
+<p><img src="https://zlisnail.cn/img/image-20231017225434461.png" alt="image-20231017225434461"></p>
+<h4 id="有关MBGD，BGD，SGD的讨论"><a href="#有关MBGD，BGD，SGD的讨论" class="headerlink" title="有关MBGD，BGD，SGD的讨论"></a>有关MBGD，BGD，SGD的讨论</h4><p><img src="https://zlisnail.cn/img/image-20231017230249728.png" alt="image-20231017230249728"></p>
+<p>注意，MBGD的采样是在已有所有采样当中随机选择部分采样处理，而BGD是直接处理所有采样。</p>
+<p><img src="https://zlisnail.cn/img/image-20231017230745372.png" alt="image-20231017230745372"></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="http://example.com">lisnail</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="http://example.com/2023/10/17/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%94%EF%BC%89-%E9%9A%8F%E6%9C%BA%E8%BF%91%E4%BC%BC%E4%B8%8E%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/">http://example.com/2023/10/17/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%94%EF%BC%89-%E9%9A%8F%E6%9C%BA%E8%BF%91%E4%BC%BC%E4%B8%8E%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="http://example.com" target="_blank">蜗牛小仓</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0/">强化学习</a><a class="post-meta__tags" href="/tags/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E6%95%B0%E5%AD%A6%E5%8E%9F%E7%90%86/">强化学习数学原理</a></div><div class="post_share"><div class="social-share" data-image="https://zlisnail.cn/img/image-20231010164027648.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><div class="next-post pull-full"><a href="/2023/10/10/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E5%9B%9B%EF%BC%89-%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%96%B9%E6%B3%95/" title="强化学习笔记（四）-蒙特卡洛方法"><img class="cover" src="https://zlisnail.cn/img/image-20231009235956900.png" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">强化学习笔记（四）-蒙特卡洛方法</div></div></a></div></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相关推荐</span></div><div class="relatedPosts-list"><div><a href="/2023/09/13/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0-%E8%B4%9D%E5%B0%94%E6%9B%BC%E5%85%AC%E5%BC%8F/" title="强化学习笔记（一）--贝尔曼公式"><img class="cover" src="https://zlisnail.cn/img/image-20230913230314418.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-13</div><div class="title">强化学习笔记（一）--贝尔曼公式</div></div></a></div><div><a href="/2023/09/15/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89-%E8%B4%9D%E5%B0%94%E6%9B%BC%E6%9C%80%E4%BC%98%E5%85%AC%E5%BC%8F/" title="强化学习笔记（二）--贝尔曼最优公式"><img class="cover" src="https://zlisnail.cn/img/image-20230915174613099.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-15</div><div class="title">强化学习笔记（二）--贝尔曼最优公式</div></div></a></div><div><a href="/2023/09/16/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89-%E5%80%BC%E8%BF%AD%E4%BB%A3%E4%B8%8E%E7%AD%96%E7%95%A5%E8%BF%AD%E4%BB%A3/" title="强化学习笔记（三）--值迭代与策略迭代"><img class="cover" src="https://zlisnail.cn/img/image-20230916232419214.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-09-16</div><div class="title">强化学习笔记（三）--值迭代与策略迭代</div></div></a></div><div><a href="/2023/10/10/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E5%9B%9B%EF%BC%89-%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%96%B9%E6%B3%95/" title="强化学习笔记（四）-蒙特卡洛方法"><img class="cover" src="https://zlisnail.cn/img/image-20231009235956900.png" alt="cover"><div class="content is-center"><div class="date"><i class="far fa-calendar-alt fa-fw"></i> 2023-10-10</div><div class="title">强化学习笔记（四）-蒙特卡洛方法</div></div></a></div></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info"><div class="is-center"><div class="avatar-img"><img src="/img/avatar.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info__name">lisnail</div><div class="author-info__description">full speed ahead</div></div><div class="card-info-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">9</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">6</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">3</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/foresnailis"><i class="fab fa-github"></i><span>Follow me</span></a></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">欢迎来到我的博客！目前还没有完全完善，有许多可以改进的地方，后续会慢慢调整！</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%94%EF%BC%89%E2%80%94%E9%9A%8F%E6%9C%BA%E8%BF%91%E4%BC%BC%E4%B8%8E%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="toc-number">1.</span> <span class="toc-text">强化学习笔记（五）—随机近似与随机梯度下降</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#mean-estimation"><span class="toc-number">1.1.</span> <span class="toc-text">mean estimation</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Robbins-Monro-algorithm"><span class="toc-number">1.2.</span> <span class="toc-text">Robbins-Monro algorithm</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#RM%E7%AE%97%E6%B3%95"><span class="toc-number">1.2.1.</span> <span class="toc-text">RM算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Stochastic-gradient-descent-%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D"><span class="toc-number">1.2.2.</span> <span class="toc-text">Stochastic gradient descent 随机梯度下降</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#SGD%E8%A7%A3%E5%86%B3%E7%9A%84%E9%97%AE%E9%A2%98%E4%B8%8E%E5%BD%A2%E5%BC%8F"><span class="toc-number">1.2.2.1.</span> <span class="toc-text">SGD解决的问题与形式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SGD%E6%94%B6%E6%95%9B%E6%80%A7%E5%8E%9F%E7%90%86"><span class="toc-number">1.2.2.2.</span> <span class="toc-text">SGD收敛性原理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SGD%E5%AE%9E%E4%BE%8B"><span class="toc-number">1.2.2.3.</span> <span class="toc-text">SGD实例</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SGD%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="toc-number">1.2.2.4.</span> <span class="toc-text">SGD的性质</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%A0%E9%9A%8F%E6%9C%BA%E5%8F%98%E9%87%8F%E7%9A%84SGD"><span class="toc-number">1.2.2.5.</span> <span class="toc-text">无随机变量的SGD</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%89%E5%85%B3MBGD%EF%BC%8CBGD%EF%BC%8CSGD%E7%9A%84%E8%AE%A8%E8%AE%BA"><span class="toc-number">1.2.2.6.</span> <span class="toc-text">有关MBGD，BGD，SGD的讨论</span></a></li></ol></li></ol></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item"><a class="thumbnail" href="/2023/10/17/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%94%EF%BC%89-%E9%9A%8F%E6%9C%BA%E8%BF%91%E4%BC%BC%E4%B8%8E%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/" title="强化学习笔记（五）-随机近似与随机梯度下降"><img src="https://zlisnail.cn/img/image-20231010164027648.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="强化学习笔记（五）-随机近似与随机梯度下降"/></a><div class="content"><a class="title" href="/2023/10/17/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%94%EF%BC%89-%E9%9A%8F%E6%9C%BA%E8%BF%91%E4%BC%BC%E4%B8%8E%E9%9A%8F%E6%9C%BA%E6%A2%AF%E5%BA%A6%E4%B8%8B%E9%99%8D/" title="强化学习笔记（五）-随机近似与随机梯度下降">强化学习笔记（五）-随机近似与随机梯度下降</a><time datetime="2023-10-17T15:13:07.000Z" title="发表于 2023-10-17 23:13:07">2023-10-17</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/10/10/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E5%9B%9B%EF%BC%89-%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%96%B9%E6%B3%95/" title="强化学习笔记（四）-蒙特卡洛方法"><img src="https://zlisnail.cn/img/image-20231009235956900.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="强化学习笔记（四）-蒙特卡洛方法"/></a><div class="content"><a class="title" href="/2023/10/10/%E5%BC%BA%E5%8C%96%E5%AD%A6%E4%B9%A0%E7%AC%94%E8%AE%B0%EF%BC%88%E5%9B%9B%EF%BC%89-%E8%92%99%E7%89%B9%E5%8D%A1%E6%B4%9B%E6%96%B9%E6%B3%95/" title="强化学习笔记（四）-蒙特卡洛方法">强化学习笔记（四）-蒙特卡洛方法</a><time datetime="2023-10-09T16:06:35.000Z" title="发表于 2023-10-10 00:06:35">2023-10-10</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/10/02/%E7%8C%AB%E5%8F%98%E8%99%8E/" title="猫变虎"><img src="https://zlisnail.cn/img/%E7%89%B9%E5%BE%81%E7%BA%BF.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="猫变虎"/></a><div class="content"><a class="title" href="/2023/10/02/%E7%8C%AB%E5%8F%98%E8%99%8E/" title="猫变虎">猫变虎</a><time datetime="2023-10-01T21:48:42.000Z" title="发表于 2023-10-02 05:48:42">2023-10-02</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/09/26/GAMES101-%E7%8E%B0%E4%BB%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%85%A5%E9%97%A8-%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/" title="GAMES101-现代计算机图形学入门-笔记（三）"><img src="https://zlisnail.cn/img/image-20230924232653880.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GAMES101-现代计算机图形学入门-笔记（三）"/></a><div class="content"><a class="title" href="/2023/09/26/GAMES101-%E7%8E%B0%E4%BB%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%85%A5%E9%97%A8-%E7%AC%94%E8%AE%B0%EF%BC%88%E4%B8%89%EF%BC%89/" title="GAMES101-现代计算机图形学入门-笔记（三）">GAMES101-现代计算机图形学入门-笔记（三）</a><time datetime="2023-09-26T10:45:48.000Z" title="发表于 2023-09-26 18:45:48">2023-09-26</time></div></div><div class="aside-list-item"><a class="thumbnail" href="/2023/09/16/GAMES101-%E7%8E%B0%E4%BB%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%85%A5%E9%97%A8-%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/" title="GAMES101-现代计算机图形学入门-笔记（二）"><img src="https://zlisnail.cn/img/image-20230916165845055.png" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="GAMES101-现代计算机图形学入门-笔记（二）"/></a><div class="content"><a class="title" href="/2023/09/16/GAMES101-%E7%8E%B0%E4%BB%A3%E8%AE%A1%E7%AE%97%E6%9C%BA%E5%9B%BE%E5%BD%A2%E5%AD%A6%E5%85%A5%E9%97%A8-%E7%AC%94%E8%AE%B0%EF%BC%88%E4%BA%8C%EF%BC%89/" title="GAMES101-现代计算机图形学入门-笔记（二）">GAMES101-现代计算机图形学入门-笔记（二）</a><time datetime="2023-09-16T15:29:29.000Z" title="发表于 2023-09-16 23:29:29">2023-09-16</time></div></div></div></div></div></div></main><footer id="footer" style="background-image: url('https://zlisnail.cn/img/image-20231010164027648.png')"><div id="footer-wrap"><div class="copyright">&copy;2023 By lisnail</div><div class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo</a><span class="footer-separator">|</span><span>主题 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly</a></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [['$', '$'], ['\\(', '\\)']],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, '']
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typesetPromise()
+}</script></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script><div id="local-search"><div class="search-dialog"><nav class="search-nav"><span class="search-dialog-title">搜索</span><span id="loading-status"></span><button class="search-close-button"><i class="fas fa-times"></i></button></nav><div class="is-center" id="loading-database"><i class="fas fa-spinner fa-pulse"></i><span>  数据库加载中</span></div><div class="search-wrap"><div id="local-search-input"><div class="local-search-box"><input class="local-search-box--input" placeholder="搜索文章" type="text"/></div></div><hr/><div class="no-result" id="local-search-results"></div><div id="local-search-stats-wrap"></div></div></div><div id="search-mask"></div><script src="/js/search/local-search.js"></script></div></div></body></html>
